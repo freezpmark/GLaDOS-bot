@@ -1,4 +1,4 @@
-import time, os, json
+import time, os, json, pytz
 import discord
 from discord.ext import commands
 from datetime import datetime
@@ -9,7 +9,7 @@ client = commands.Bot(command_prefix=gconfig['prefix'])
 
 # Helping functions
 def get_timeRole(member):
-    time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    time = datetime.now(pytz.timezone('Europe/Bratislava')).strftime('%Y-%m-%d %H:%M:%S')
     toprole = '(' + str(member.top_role) + ')' if gconfig['logs']['member_role'] == '1' else ''
     return time, toprole
 
