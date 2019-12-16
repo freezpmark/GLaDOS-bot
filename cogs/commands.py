@@ -6,19 +6,19 @@ class Commands(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(brief="Rolls a number between 1 and 100. (?roll 1000)")
+    @commands.command(brief="Rolls a number between 1 and 100. (roll 1000)")
     async def roll(self, ctx, end=100):
         await ctx.send(ctx.message.author.mention + ' rolls ' + str(random.randint(1, end)) + ' (1-' + str(end) + ')')
 
     @commands.command(brief="Enables Python interactive shell.")
     async def python(self, ctx):
-        await ctx.send('Python mode activated! Exit by "?"')
+        await ctx.send(f'Python mode activated! Exit by "{ctx.prefix}"')
         await self.client.change_presence(activity=discord.Game(name='Python'))
 
         ans = 0
         msg = await self.client.wait_for('message', check=lambda message: message.author == ctx.author and message.channel == ctx.channel)
 
-        while not msg.content.startswith('?'):
+        while not msg.content.startswith(f'{ctx.prefix}'):
             try:                                # evaluating with value return
                 ans = eval(msg.content)
                 await ctx.send(ans)
@@ -28,11 +28,11 @@ class Commands(commands.Cog):
                 except Exception as e:          # invalid input
                     await ctx.send(e)
             msg = await self.client.wait_for('message', check=lambda message: message.author == ctx.author and message.channel == ctx.channel)
-
+       
         await self.client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name='you'))
         await ctx.send("Python mode deactivated!")
 
-    @commands.command(brief="Deletes specified number of messages. (?clear 5)")
+    @commands.command(brief="Deletes specified number of messages. (clear 5)")
     async def clear(self, ctx, amount=5):
         channel = ctx.message.channel
         async for message in channel.history(limit=int(amount) + 1):
@@ -41,8 +41,8 @@ class Commands(commands.Cog):
 
     @commands.command(brief="Joins or moves to voice channel.++")
     async def join(self, ctx, *, name=None):
-        ''' "?join" - bot joins the voice channel in which is the current user
-"?join radio" - bot joins "radio" voice channel'''
+        ''' "join" - bot joins the voice channel in which is the current user
+"join radio" - bot joins "radio" voice channel'''
         if name:
             channel = discord.utils.find(lambda r: r.name == name, ctx.guild.channels)
     
