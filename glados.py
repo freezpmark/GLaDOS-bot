@@ -36,7 +36,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     await client.process_commands(message)
-    print((gconfig['bypass_channels']))
+    print("1, " + gconfig['bypass_channels'])
 
     # Dont read bot's messages
     if "Skynet" in [y.name for y in message.author.roles]:
@@ -46,7 +46,11 @@ async def on_message(message):
     time, topRole = get_timeRole(message.author)
     msg = f'{time}: {message.author.name}{topRole} sent "{message.content}" to {message.channel}.'
     # fwrite(msg)
+
+    print("2, " + message.channel.name)
+    print("3, " + gconfig['bypass_channels'])
     if gconfig['logs']['msg_post'] == '1' and message.channel.name not in gconfig['bypass_channels']:
+        print("3, passed condition, msg: " + msg)
         await logs_channel.send(msg)
 
 @client.event
