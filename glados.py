@@ -36,6 +36,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     await client.process_commands(message)
+    print(gconfig['bypass_channels'])
 
     # Dont read bot's messages
     if "Skynet" in [y.name for y in message.author.roles]:
