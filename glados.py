@@ -48,10 +48,6 @@ async def on_message(message):
     if gconfig['logs']['msg_post'] == '1' and message.channel.name not in gconfig['bypass_channels']:
         await logs_channel.send(msg)
 
-    # Remind this channel is only for bot commands
-    if not message.content.startswith(('!', gconfig['prefix'], '-')) and message.channel.id == gconfig['IDs']['bot']:
-        await message.channel.send(f"This channel is only for bot commands {message.author.mention}!")
-
 @client.event
 async def on_message_delete(message):
     if "Skynet" in [y.name for y in message.author.roles]:  # dont read bot's action
@@ -127,12 +123,6 @@ async def on_member_join(member):
     if gconfig['logs']['member_join'] != '0':
         await logs_channel.send(msg)
 
-    # Welcome message
-    await discord.utils.get(member.guild.channels, id=gconfig['IDs']['welcome']).send(f"""
-Hello and, again, welcome to the Aperture Science computer-aided enrichment center {member.mention}. We hope your stay on this server will be a pleasant one.
-Your specimen has been processed and we are now ready to begin the test proper. Before we start, however, keep in mind that although fun and learning are the primary goals of all enrichment center activities, serious bans may occur.
-For your own safety and the safety of others, please refrain from touching-- Por favor bordón de fallar Muchos gracias de fallar gracias stand back. The community will be open in three. two. one.""")
-
 @client.event
 async def on_member_remove(member):
     time, topRole = get_timeRole(member)
@@ -206,32 +196,28 @@ async def bypass(ctx, channel=None, val=None):
     ''' "?bypass <channel_name> 1" - adds channel for bypassing
     "?bypass <channel_name> 0" - removes channel from bypassing'''
 
-    with open('config.json', 'r') as f3:
-        config = json.load(f3)
-
+    global gconfig
     if channel and val:
         val = "1" if val != "0" else "0"
-        if val == "1" and channel in config['bypass_channels']:
+        if val == "1" and channel in gconfig['bypass_channels']:
             return await ctx.send('"{}" channel is already being bypassed!'.format(channel))
-        elif val == "0" and channel not in config['bypass_channels']:
+        elif val == "0" and channel not in gconfig['bypass_channels']:
             return await ctx.send('"{}" channel isnt bypassed!'.format(channel))
 
         if val != "0":
-            config['bypass_channels'].append(channel)
+            gconfig['bypass_channels'].append(channel)
             msg = f'{channel} channel is now being tracked.'
         else: 
-            config['bypass_channels'].remove(channel)
+            gconfig['bypass_channels'].remove(channel)
             msg = f'{channel} channel is now being untracked.'
         with open('config.json', 'w') as f4:
-            json.dump(config, f4, sort_keys=True, indent=4)
-        global gconfig
-        gconfig = config
+            json.dump(gconfig, f4, sort_keys=True, indent=4)
         await logs_channel.send(msg)
         return await ctx.send(msg)
     
     else: # display current bypass settings
         embed = discord.Embed(colour = discord.Colour.blue())
-        embed.add_field(name='Bypass configuration', value=config['bypass_channels'])
+        embed.add_field(name='Bypass configuration', value=gconfig['bypass_channels'])
         return await ctx.send(embed=embed)
 
 @client.command(brief="Surveillance settings properties.++")
@@ -253,21 +239,17 @@ member_update (nick change, on/off, dnd, idle, activity),
 member_voice (deaf, mute, broadcast, afk, join/move voice channel),
 member_role (shows user's role after name)'''
 
-        with open('config.json', 'r') as fopen:
-            config = json.load(fopen)
-
+        global gconfig
         if action and val:
             val = "1" if val != "0" else "0"
-            if action not in config['logs']:
+            if action not in gconfig['logs']:
                 return await ctx.send("{} doesnt exist in logs configuration.".format(action))
-            elif val == config['logs'][action]:
+            elif val == gconfig['logs'][action]:
                 return await ctx.send("{} action is already being {}.".format(action, "untracked" if val == "0" else "tracked"))
 
-            config['logs'][action] = val
+            gconfig['logs'][action] = val
             with open('config.json', 'w') as fopen:
-                json.dump(config, fopen, sort_keys=True, indent=4)
-            global gconfig
-            gconfig = config
+                json.dump(gconfig, fopen, sort_keys=True, indent=4)
             msg = '{} action is now being {}'.format(action, "untracked" if val == "0" else "tracked")
             await logs_channel.send(msg)
             await ctx.send(msg)
@@ -281,8 +263,8 @@ member_role (shows user's role after name)'''
             #embed.set_image(url='')
             #embed.set_thumbnail(url='')
             #embed.set_author(name='Author Name') #icon_url
-            for action in config['logs']:
-                embed.add_field(name=action, value=config['logs'][action])
+            for action in gconfig['logs']:
+                embed.add_field(name=action, value=gconfig['logs'][action])
             await ctx.send(embed=embed)
 
 if __name__ == '__main__':

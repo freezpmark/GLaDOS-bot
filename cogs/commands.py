@@ -1,6 +1,5 @@
-import discord
+import discord, random
 from discord.ext import commands
-import os, random
 
 class Commands(commands.Cog):
     def __init__(self, client):
@@ -38,46 +37,6 @@ class Commands(commands.Cog):
         async for message in channel.history(limit=int(amount) + 1):
             await message.delete()
         await ctx.send(f'{amount} messages has been deleted.')
-
-    @commands.command(brief="Joins or moves to voice channel.++")
-    async def join(self, ctx, *, name=None):
-        ''' "join" - bot joins the voice channel in which is the current user
-"join radio" - bot joins "radio" voice channel'''
-        if name:
-            channel = discord.utils.find(lambda r: r.name == name, ctx.guild.channels)
-    
-        if ctx.voice_client is not None:
-            if name:
-                return await ctx.voice_client.move_to(channel)
-            else:
-                return await ctx.voice_client.move_to(ctx.author.voice.channel)
-        elif name:
-            return await channel.connect()
-        else:
-            await ctx.author.voice.channel.connect()
-
-    @commands.command(brief="Disconnects the bot from voice channel.")
-    async def leave(self, ctx):
-        await ctx.voice_client.disconnect()
-
-    '''
-    @commands.command(brief="Plays a file from the local filesystem.++",
-                    description=str(os.listdir('audio')).replace('.mp3',''))
-    async def play(self, ctx, *, query):
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio("audio/" + query + ".mp3"))
-        ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
-
-    @play.before_invoke
-    async def ensure_voice(self, ctx):
-        if ctx.voice_client is None:
-            if ctx.author.voice:
-                await ctx.author.voice.channel.connect()
-            else:
-                await ctx.send("You are not connected to a voice channel.")
-                raise commands.CommandError("Author not connected to a voice channel.")
-        elif ctx.voice_client.is_playing():
-            ctx.voice_client.stop()
-    '''
 
 def setup(client):
     client.add_cog(Commands(client))
