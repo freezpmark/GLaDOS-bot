@@ -3,9 +3,8 @@ import discord
 from discord.ext import commands
 from datetime import datetime
 
-with open('config.json', 'r') as cf, open('token.json', 'r') as tf:
+with open('config.json', 'r') as cf:
     gconfig = json.load(cf)
-    gtoken = json.load(tf)
 client = commands.Bot(command_prefix=gconfig['prefix'])
 
 # Helping functions
@@ -280,4 +279,4 @@ if __name__ == '__main__':
             except Exception as e:
                 print(f'{file} module cannot be loaded. [{e}]')
 
-    client.run(gtoken['token'])
+    client.run(os.environ["ACCESS_TOKEN"])
